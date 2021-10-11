@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:preferencias_usuario/src/pages/home_page.dart';
 import 'package:preferencias_usuario/src/pages/settings_page.dart';
+import 'package:preferencias_usuario/src/shared/preferencias_usuario.dart';
 
-void main() => runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = PreferenciasUsuario();
+  await prefs.initPrefs();
+
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final prefs = PreferenciasUsuario();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: HomePage.routeName,
+      initialRoute: prefs.ultimaPagina,
       routes: {
-        HomePage.routeName: (_) => const HomePage(),
+        HomePage.routeName: (_) => HomePage(),
         SettingsPage.routeName: (_) => const SettingsPage()
       },
     );

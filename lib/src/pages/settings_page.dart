@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:preferencias_usuario/src/shared/preferencias_usuario.dart';
+import 'package:preferencias_usuario/src/widgets/drawer_widget.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -12,23 +15,29 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _secondaryColor = false;
-  int _genero = 1;
-  final String _nombre = 'Juan';
+  int _genero = 0;
   TextEditingController? _editingController;
+
+  final prefs = PreferenciasUsuario();
 
   @override
   void initState() {
-    _editingController = TextEditingController(text: _nombre);
     super.initState();
+    _genero = prefs.genero;
+    prefs.ultimaPagina = SettingsPage.routeName;
+    _secondaryColor = prefs.colorSecundario;
+    _editingController = TextEditingController(text: prefs.nombre);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: (prefs.colorSecundario) ? Colors.teal : Colors.blue,
           centerTitle: true,
-          title: const Text('HomePage'),
+          title: const Text('Ajustes'),
         ),
+        drawer: const DrawerWidget(),
         body: Container(
             padding: const EdgeInsets.all(20),
             child: ListView(
@@ -46,10 +55,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     SwitchListTile(
                         title: const Text('Secondary Color'),
-                        value: _secondaryColor,
+                        value: _secondaryColor!,
                         onChanged: (value) {
                           setState(() {
                             _secondaryColor = value;
+                            prefs.colorSecundario = value;
                           });
                         }),
                     RadioListTile(
@@ -57,19 +67,21 @@ class _SettingsPageState extends State<SettingsPage> {
                         value: 1,
                         groupValue: _genero,
                         onChanged: (value) {
-                          setState(() {
-                            _genero = value as int;
-                          });
+                          setState(() {});
+                          _genero = value as int;
+                          prefs.genero = value;
                         }),
                     RadioListTile(
-                        title: const Text('Femenino'),
-                        value: 2,
-                        groupValue: _genero,
-                        onChanged: (value) {
-                          setState(() {
-                            _genero = value as int;
-                          });
-                        }),
+                      title: const Text('Femenino'),
+                      value: 2,
+                      groupValue: _genero,
+                      onChanged: (value) {
+                        setState(() {
+                          _genero = value as int;
+                          prefs.genero = value;
+                        });
+                      },
+                    ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: TextField(
@@ -77,6 +89,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         decoration: const InputDecoration(
                             labelText: 'Nombre',
                             helperText: 'Nombre de usuario'),
+                        onChanged: (value) {
+                          prefs.nombre = value;
+                        },
                       ),
                     )
                   ],
